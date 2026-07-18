@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1"
+    />
+    <meta name="theme-color" content="#000000" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>MyeloTrack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script type="module" src="/src/main.js"></script>
+  </head>
+  <body>
+    <div class="device">
+      <!-- Large-title nav bar -->
+      <header class="navbar" id="navbar">
+        <div class="eyebrow">
+          <span class="date" id="navDate"></span>
+          <div class="avatar" id="navAvatar">PS</div>
+        </div>
+        <h1 class="large-title" id="navTitle">Today</h1>
+      </header>
+
+      <!-- Scrollable tab views -->
+      <main class="scroll" id="scroll">
+        <section class="tab-view active" id="view-today"></section>
+        <section class="tab-view" id="view-meds"></section>
+        <section class="tab-view" id="view-labs"></section>
+        <section class="tab-view" id="view-pallor"></section>
+      </main>
+
+      <!-- Bottom tab bar -->
+      <nav class="tabbar" id="tabbar"></nav>
+    </div>
+
+    <!-- Reusable modal sheet + toast -->
+    <div class="sheet-backdrop" id="sheetBackdrop"></div>
+    <div class="sheet" id="sheet"></div>
+    <div class="toast" id="toast"></div>
+  </body>
+</html>

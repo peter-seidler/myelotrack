@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Build output
+web/dist/
+dist/
+
+# Env / secrets — never commit real PHI credentials
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Test / coverage
+coverage/
