@@ -9,6 +9,8 @@ async function request(path, options = {}) {
   // FormData sets its own multipart content-type (with boundary); don't override.
   const isForm = typeof FormData !== 'undefined' && options.body instanceof FormData;
   const res = await fetch(`${API_BASE}${path}`, {
+    // Send the session cookie (works cross-origin via CORS allow-credentials).
+    credentials: 'include',
     ...options,
     headers: {
       ...(isForm ? {} : { 'content-type': 'application/json' }),
@@ -48,4 +50,20 @@ export const api = {
   connectSource: (source) => request(`/api/v1/integrations/${source}/connect`),
   syncSource: (source) =>
     request(`/api/v1/integrations/${source}/sync`, { method: 'POST' }),
+
+  // Auth (passkeys)
+  authMe: () => request('/api/v1/auth/me'),
+  authLogout: () => request('/api/v1/auth/logout', { method: 'POST' }),
+  registrationOptions: () => request('/api/v1/auth/registration/options'),
+  registrationVerify: (attestation) =>
+    request('/api/v1/auth/registration/verify', {
+      method: 'POST',
+      body: JSON.stringify(attestation),
+    }),
+  authenticationOptions: () => request('/api/v1/auth/authentication/options'),
+  authenticationVerify: (assertion) =>
+    request('/api/v1/auth/authentication/verify', {
+      method: 'POST',
+      body: JSON.stringify(assertion),
+    }),
 };

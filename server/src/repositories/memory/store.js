@@ -8,6 +8,9 @@ import { buildSeed, computeFlag } from '../../data/seed.js';
  */
 export function createMemoryRepository() {
   const db = buildSeed();
+  // WebAuthn state for the singleton user (passkey credentials + the
+  // in-flight registration/authentication challenge).
+  const auth = { challenge: null, credentials: [] };
 
   const inRange = (date, from, to) => {
     const t = new Date(date).getTime();
@@ -170,6 +173,28 @@ export function createMemoryRepository() {
       }
       Object.assign(conn, patch);
       return conn;
+    },
+
+    // --- Auth (passkeys) ---
+    setAuthChallenge(challenge) {
+      auth.challenge = challenge;
+    },
+    getAuthChallenge() {
+      return auth.challenge;
+    },
+    listCredentials() {
+      return auth.credentials;
+    },
+    getCredential(id) {
+      return auth.credentials.find((c) => c.id === id) || null;
+    },
+    addCredential(cred) {
+      auth.credentials.push(cred);
+      return cred;
+    },
+    updateCredentialCounter(id, counter) {
+      const cred = auth.credentials.find((c) => c.id === id);
+      if (cred) cred.counter = counter;
     },
 
     // --- Audit ---

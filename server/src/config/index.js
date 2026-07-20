@@ -47,6 +47,20 @@ export const config = {
     msk: fhirSource('MSK'),
     'capital-health': fhirSource('CAPITAL_HEALTH'),
   },
+  // Passkey (WebAuthn) auth. Off by default so the single-tenant dev/seed
+  // setup keeps working; flip AUTH_REQUIRED=true before serving real PHI.
+  auth: {
+    required: process.env.AUTH_REQUIRED === 'true',
+    rpId: process.env.RP_ID || 'localhost',
+    rpName: process.env.RP_NAME || 'MyeloTrack',
+    // Expected origin(s) of the web app, for WebAuthn verification.
+    origin: (process.env.RP_ORIGIN || 'http://localhost:5173')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean),
+    // HMAC secret for session tokens. Defaults to the field key if unset.
+    sessionSecret: process.env.SESSION_SECRET || process.env.FIELD_ENCRYPTION_KEY || '',
+  },
 };
 
 /** True when a source has enough config to attempt the OAuth flow. */

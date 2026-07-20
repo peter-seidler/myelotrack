@@ -29,6 +29,11 @@ const userSchema = new Schema(
     dob: Date,
     condition: { primary: String, icd10: [String], notes: String },
     careTeams: [{ key: String, name: String, mrn: String }],
+    // WebAuthn (passkeys)
+    currentChallenge: String,
+    credentials: [
+      { id: String, publicKey: String, counter: Number, transports: [String] },
+    ],
   },
   opts,
 );
