@@ -65,6 +65,10 @@ export async function createMongoRepository(uri) {
       return lean(Medication.find({ userId, active: true }));
     },
     async logDose(medicationId, { status, scheduledFor, takenAt, note } = {}) {
+      // Parity with the memory repo: unknown medication → null (controller 400s).
+      if (!mongoose.isValidObjectId(medicationId)) return null;
+      const med = await Medication.findOne({ _id: medicationId, userId }).lean();
+      if (!med) return null;
       const doc = await DoseLog.create({
         userId,
         medicationId,
@@ -120,8 +124,9 @@ export async function createMongoRepository(uri) {
     },
 
     recordAudit(entry) {
-      // Fire-and-forget; never block the response on the audit write.
-      AuditLog.create({ userId, ...entry }).catch((err) =>
+      // Fire-and-forget for the middleware (it does not await); returns the
+      // promise so callers/tests that want to await the write can.
+      return AuditLog.create({ userId, ...entry }).catch((err) =>
         console.error('[audit] write failed', err),
       );
     },
