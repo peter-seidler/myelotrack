@@ -77,9 +77,19 @@ GET    /api/v1/labs?analyte=&source=   # aggregated results, filterable
 GET    /api/v1/labs/analytes           # distinct analytes seen
 GET    /api/v1/pallor                  # photo entries (metadata + signed URLs)
 POST   /api/v1/pallor                  # upload a new photo (multipart → object store)
-POST   /api/v1/integrations/:source/sync   # trigger an on-demand pull
+GET    /api/v1/integrations/:source/connect   # begin SMART auth → { authorizeUrl }
+GET    /api/v1/integrations/:source/callback  # OAuth redirect: exchange code, store tokens
+POST   /api/v1/integrations/:source/sync   # pull latest (real FHIR sync when connected)
 GET    /api/v1/integrations/status     # last-sync + connection health per source
 ```
+
+The SMART on FHIR flow is implemented: `connect` builds a PKCE + `state`
+authorize URL, `callback` exchanges the code and stores **encrypted** tokens
+(AES-256-GCM, `FIELD_ENCRYPTION_KEY`), and `sync` pulls laboratory
+`Observation`s, normalizes them by LOINC, and idempotently upserts by
+`provenance.externalId`. The auth/exchange/fetch/normalize logic is unit-tested
+with an injected `fetch`; connecting to a live Epic endpoint needs sandbox
+credentials (per-source env vars — see `server/.env.example`).
 
 Conventions: bearer token in `Authorization`, ISO-8601 timestamps in UTC,
 cursor pagination on list endpoints, and every lab/observation carries a

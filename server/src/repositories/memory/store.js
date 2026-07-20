@@ -79,6 +79,28 @@ export function createMemoryRepository() {
     listAnalytes() {
       return [...new Set(db.labResults.map((l) => l.analyte))];
     },
+    /**
+     * Idempotently insert/update lab results. Dedup by provenance.externalId
+     * (FHIR-sourced) so re-syncs don't duplicate; results without one are
+     * always inserted. Returns the number processed.
+     */
+    upsertLabResults(results = []) {
+      for (const r of results) {
+        const externalId = r.provenance?.externalId;
+        const existing = externalId
+          ? db.labResults.find((l) => l.provenance?.externalId === externalId)
+          : null;
+        if (existing) {
+          Object.assign(existing, r);
+        } else {
+          db.labResults.push({
+            _id: r._id || `lab_${db.labResults.length}_${externalId || 'm'}`,
+            ...r,
+          });
+        }
+      }
+      return results.length;
+    },
 
     // --- Pallor ---
     listPallor() {
@@ -113,6 +135,18 @@ export function createMemoryRepository() {
       conn.lastSyncAt = new Date();
       conn.status = 'connected';
       return { source: conn.source, status: conn.status, lastSyncAt: conn.lastSyncAt };
+    },
+    getConnection(source) {
+      return db.integrationConnections.find((c) => c.source === source) || null;
+    },
+    updateConnection(source, patch) {
+      let conn = db.integrationConnections.find((c) => c.source === source);
+      if (!conn) {
+        conn = { source };
+        db.integrationConnections.push(conn);
+      }
+      Object.assign(conn, patch);
+      return conn;
     },
 
     // --- Audit ---
