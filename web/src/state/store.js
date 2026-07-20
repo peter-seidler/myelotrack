@@ -1,4 +1,11 @@
 import { buildInitialState } from '../data/seed.js';
+import { api } from '../api/client.js';
+import {
+  labsToStore,
+  medsToStore,
+  pallorToStore,
+  symptomHistoryToStore,
+} from '../api/adapters.js';
 
 /**
  * Minimal observable store. Holds the single in-memory app state, notifies
@@ -39,6 +46,27 @@ function createStore(initialState) {
     subscribe(listener) {
       listeners.add(listener);
       return () => listeners.delete(listener);
+    },
+
+    /**
+     * Replace the read slices (labs, meds, pallor, symptom history) with live
+     * data from the API. Throws if any fetch fails so the caller can fall back
+     * to the seed that's already loaded. The working "today" check-in and dose
+     * log stay local.
+     */
+    async hydrate() {
+      const [meds, labs, pallor, symptoms] = await Promise.all([
+        api.getMedications(),
+        api.getLabs(),
+        api.getPallor(),
+        api.getSymptoms(),
+      ]);
+      state.medications = medsToStore(meds);
+      state.labs = labsToStore(labs);
+      state.pallor = pallorToStore(pallor);
+      const history = symptomHistoryToStore(symptoms);
+      if (history.length) state.symptomHistory = history;
+      notify();
     },
   };
 }

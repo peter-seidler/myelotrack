@@ -36,9 +36,21 @@ npm run lint           # ESLint across both workspaces
 npm run format         # Prettier
 ```
 
-The client seeds realistic sample data in memory on load — refresh to reset.
-Camera-based pallor capture needs a secure context, so use the Vite dev server
-(or any HTTPS host) rather than opening the file over `file://`.
+By default the client runs fully offline on seeded in-memory data — refresh to
+reset. To point it at the live API instead, set `VITE_API_BASE_URL`:
+
+```bash
+# terminal 1 — API
+npm run dev:server
+# terminal 2 — client wired to it
+VITE_API_BASE_URL=http://localhost:8787 npm run dev:web
+```
+
+The client then hydrates its reads from the API and writes check-ins, doses,
+and pallor readings back to it; if the API is unreachable it falls back to the
+seed so the UI still loads. Camera-based pallor capture needs a secure context,
+so use the Vite dev server (or any HTTPS host) rather than opening the file over
+`file://`.
 
 ## Architecture in one paragraph
 

@@ -6,11 +6,32 @@ import { openSheet, closeSheet } from '../ui/sheet.js';
 import { toast } from '../ui/toast.js';
 import { latestDraw } from '../data/labs.js';
 import { totalSymptomScore } from '../data/symptoms.js';
+import { api } from '../api/client.js';
+import { USE_API } from '../config.js';
 
 /** Render the Pallor tab: conjunctiva photo readings vs. hemoglobin context. */
 export function renderPallor(container) {
   const { state } = store;
   clear(container);
+
+  if (state.pallor.length === 0) {
+    container.append(el('div', { class: 'section-title' }, 'New reading'));
+    container.append(
+      el(
+        'button',
+        { class: 'btn secondary', onclick: openCaptureSheet },
+        'Capture eye photo',
+      ),
+    );
+    container.append(
+      el(
+        'div',
+        { class: 'empty' },
+        'No readings yet. Capture your first eye photo above.',
+      ),
+    );
+    return;
+  }
 
   const latest = state.pallor[0];
   const previous = state.pallor[1];
@@ -131,6 +152,11 @@ function openCaptureSheet() {
             if (stream) stream.getTracks().forEach((t) => t.stop());
             closeSheet();
             toast('Reading saved');
+            if (USE_API) {
+              api
+                .createPallor({ pallorScore: Number(score.toFixed(2)), eye: 'right' })
+                .catch(() => toast('Sync failed'));
+            }
           },
         },
         'Take photo',
