@@ -48,6 +48,25 @@ export function createMemoryRepository() {
     listMedications() {
       return db.medications.filter((m) => m.active);
     },
+    /**
+     * Idempotently insert/update medications from a sync. Dedup by
+     * provenance.externalId (FHIR-sourced); others are appended. Returns count.
+     */
+    upsertMedications(meds = []) {
+      for (const m of meds) {
+        const externalId = m.provenance?.externalId;
+        const existing = externalId
+          ? db.medications.find((x) => x.provenance?.externalId === externalId)
+          : null;
+        if (existing) Object.assign(existing, m);
+        else
+          db.medications.push({
+            _id: m._id || `med_${db.medications.length}_${externalId || 'm'}`,
+            ...m,
+          });
+      }
+      return meds.length;
+    },
     logDose(medicationId, { status, scheduledFor, takenAt, note } = {}) {
       const med = db.medications.find((m) => m._id === medicationId);
       if (!med) return null;

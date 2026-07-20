@@ -6,7 +6,7 @@ import {
   buildAuthorizeUrl,
   exchangeCode,
 } from '../integrations/fhir/smart.js';
-import { syncLabsForConnection } from '../integrations/fhir/sync.js';
+import { syncForConnection } from '../integrations/fhir/sync.js';
 
 const repo = (req) => req.app.locals.repo;
 const KNOWN_SOURCES = ['msk', 'capital-health', 'apple-health'];
@@ -87,8 +87,8 @@ export const callback = asyncHandler(async (req, res) => {
 
 /**
  * POST /api/v1/integrations/:source/sync — pull the latest data.
- * If the source is connected with stored tokens, runs a real FHIR lab sync;
- * otherwise just refreshes the connection timestamp (prototype behavior).
+ * If the source is connected with stored tokens, runs a real FHIR sync (labs +
+ * medications); otherwise just refreshes the connection timestamp (prototype).
  */
 export const sync = asyncHandler(async (req, res) => {
   const { source } = req.params;
@@ -99,7 +99,7 @@ export const sync = asyncHandler(async (req, res) => {
 
   if (conn?.status === 'connected' && accessTokenEnc && config.fieldEncryptionKey) {
     const key = parseKey(config.fieldEncryptionKey);
-    const result = await syncLabsForConnection({
+    const result = await syncForConnection({
       repo: repo(req),
       source,
       fhirBaseUrl: conn.fhirBaseUrl || config.fhirSources[source]?.fhirBaseUrl,

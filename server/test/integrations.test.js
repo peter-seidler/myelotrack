@@ -66,6 +66,26 @@ beforeEach(() => {
         }),
       };
     }
+    if (String(url).includes('/MedicationRequest')) {
+      return {
+        ok: true,
+        json: async () => ({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              resource: {
+                resourceType: 'MedicationRequest',
+                id: 'mr-1',
+                status: 'active',
+                medicationCodeableConcept: { text: 'Ruxolitinib 20 mg' },
+                dosageInstruction: [{ text: '20 mg twice daily' }],
+              },
+            },
+          ],
+          link: [],
+        }),
+      };
+    }
     throw new Error(`unexpected fetch: ${url}`);
   };
 });
@@ -98,14 +118,16 @@ test('connect → callback → sync pulls and stores labs over FHIR', async () =
   assert.match(conn.tokens.accessTokenEnc, /^v1:/);
   assert.notEqual(conn.tokens.accessTokenEnc, 'access-xyz');
 
-  // 3. sync: real FHIR pull (stubbed bundle) normalizes + upserts.
+  // 3. sync: real FHIR pull (stubbed bundles) normalizes + upserts labs + meds.
   const labsBefore = repo.listLabs({ analyte: 'hemoglobin' }).length;
   const syncRes = await post('/api/v1/integrations/msk/sync');
   assert.equal(syncRes.status, 200);
   const result = (await syncRes.json()).data;
-  assert.equal(result.fetched, 1);
-  assert.equal(result.upserted, 1);
+  assert.equal(result.labs.fetched, 1);
+  assert.equal(result.labs.upserted, 1);
+  assert.equal(result.medications.upserted, 1);
   assert.equal(repo.listLabs({ analyte: 'hemoglobin' }).length, labsBefore + 1);
+  assert.ok(repo.listMedications().some((m) => m.name === 'Ruxolitinib 20 mg'));
 });
 
 test('callback rejects a mismatched state', async () => {

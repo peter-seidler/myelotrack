@@ -64,6 +64,24 @@ export async function createMongoRepository(uri) {
     listMedications() {
       return lean(Medication.find({ userId, active: true }));
     },
+    async upsertMedications(meds = []) {
+      if (!meds.length) return 0;
+      const ops = meds.map((m) => {
+        const externalId = m.provenance?.externalId;
+        if (externalId) {
+          return {
+            updateOne: {
+              filter: { userId, 'provenance.externalId': externalId },
+              update: { $set: { ...m, userId } },
+              upsert: true,
+            },
+          };
+        }
+        return { insertOne: { document: { ...m, userId } } };
+      });
+      await Medication.bulkWrite(ops, { ordered: false });
+      return meds.length;
+    },
     async logDose(medicationId, { status, scheduledFor, takenAt, note } = {}) {
       // Parity with the memory repo: unknown medication → null (controller 400s).
       if (!mongoose.isValidObjectId(medicationId)) return null;
