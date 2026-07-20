@@ -22,3 +22,7 @@ npm-debug.log*
 
 # Test / coverage
 coverage/
+
+# Local pallor image store (encrypted blobs — never commit PHI)
+.data/
+server/.data/

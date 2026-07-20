@@ -45,5 +45,23 @@ export function decryptSecret(payload, key) {
   ]).toString('utf8');
 }
 
+/** Encrypt a Buffer. Returns iv(12) ‖ authTag(16) ‖ ciphertext as one Buffer. */
+export function encryptBuffer(plaintext, key) {
+  const iv = randomBytes(12);
+  const cipher = createCipheriv(ALGO, key, iv);
+  const ct = Buffer.concat([cipher.update(plaintext), cipher.final()]);
+  return Buffer.concat([iv, cipher.getAuthTag(), ct]);
+}
+
+/** Decrypt a Buffer produced by encryptBuffer. Throws on tampering. */
+export function decryptBuffer(payload, key) {
+  const iv = payload.subarray(0, 12);
+  const tag = payload.subarray(12, 28);
+  const ct = payload.subarray(28);
+  const decipher = createDecipheriv(ALGO, key, iv);
+  decipher.setAuthTag(tag);
+  return Buffer.concat([decipher.update(ct), decipher.final()]);
+}
+
 /** Generate a fresh 32-byte key as base64 (for provisioning / tests). */
 export const generateKey = () => randomBytes(32).toString('base64');

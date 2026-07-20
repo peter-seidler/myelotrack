@@ -6,9 +6,14 @@ import { API_BASE } from '../config.js';
  * non-2xx so callers can fall back or surface the failure.
  */
 async function request(path, options = {}) {
+  // FormData sets its own multipart content-type (with boundary); don't override.
+  const isForm = typeof FormData !== 'undefined' && options.body instanceof FormData;
   const res = await fetch(`${API_BASE}${path}`, {
-    headers: { 'content-type': 'application/json' },
     ...options,
+    headers: {
+      ...(isForm ? {} : { 'content-type': 'application/json' }),
+      ...options.headers,
+    },
   });
   if (!res.ok) {
     throw new Error(`${options.method || 'GET'} ${path} → ${res.status}`);
@@ -36,4 +41,6 @@ export const api = {
     }),
   createPallor: (body) =>
     request('/api/v1/pallor', { method: 'POST', body: JSON.stringify(body) }),
+  uploadPallor: (formData) =>
+    request('/api/v1/pallor', { method: 'POST', body: formData }),
 };

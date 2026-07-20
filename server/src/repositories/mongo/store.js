@@ -139,8 +139,13 @@ export async function createMongoRepository(uri) {
         eye: entry.eye || 'right',
         pallorScore: entry.pallorScore ?? null,
         note: entry.note || '',
+        storage: entry.storage || undefined,
       });
       return doc.toObject();
+    },
+    getPallorPhoto(id) {
+      if (!mongoose.isValidObjectId(id)) return null;
+      return PallorPhoto.findOne({ _id: id, userId }).lean();
     },
 
     integrationsStatus() {
