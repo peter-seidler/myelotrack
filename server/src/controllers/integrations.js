@@ -82,6 +82,11 @@ export const callback = asyncHandler(async (req, res) => {
     },
     pendingAuth: null,
   });
+
+  // Send the browser back to the app when configured; otherwise return JSON.
+  if (config.appUrl) {
+    return res.redirect(`${config.appUrl.replace(/\/$/, '')}/?connected=${source}`);
+  }
   res.json({ data: { source, status: 'connected' } });
 });
 

@@ -43,4 +43,9 @@ export const api = {
     request('/api/v1/pallor', { method: 'POST', body: JSON.stringify(body) }),
   uploadPallor: (formData) =>
     request('/api/v1/pallor', { method: 'POST', body: formData }),
+
+  // Integrations (care teams)
+  connectSource: (source) => request(`/api/v1/integrations/${source}/connect`),
+  syncSource: (source) =>
+    request(`/api/v1/integrations/${source}/sync`, { method: 'POST' }),
 };
