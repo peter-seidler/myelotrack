@@ -81,6 +81,15 @@ is a data-source swap, not a rewrite. Full detail in
   MSK and Capital Health**, every value tagged with its source institution.
 - **Pallor** — conjunctiva eye-photo tracking with camera capture + fallback.
 
+## Progressive web app
+
+The client is an installable PWA (via `vite-plugin-pwa`/Workbox): a web app
+manifest + icons make it "Add to Home Screen"-able, and a service worker
+precaches the app shell so it launches offline. API reads use a network-first
+strategy with a cache fallback, so the last-known labs/meds/pallor still render
+without a connection. The service worker is only active in a production build
+(`npm run build` / `preview`), not in `npm run dev`.
+
 ## Data sensitivity
 
 Before any real backend serves real data: encryption at rest, encryption in
