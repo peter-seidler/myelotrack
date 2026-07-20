@@ -7,7 +7,20 @@ import { toast } from '../ui/toast.js';
 import { latestDraw } from '../data/labs.js';
 import { totalSymptomScore } from '../data/symptoms.js';
 import { api } from '../api/client.js';
+import { pallorToStore } from '../api/adapters.js';
 import { USE_API } from '../config.js';
+
+/** Grab the current video frame as a JPEG Blob (null if the camera isn't ready). */
+function captureFrame(video) {
+  return new Promise((resolve) => {
+    if (!video.videoWidth) return resolve(null);
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.9);
+  });
+}
 
 /** Render the Pallor tab: conjunctiva photo readings vs. hemoglobin context. */
 export function renderPallor(container) {
@@ -133,30 +146,50 @@ function openCaptureSheet() {
         {
           class: 'btn',
           disabled: '',
-          onclick: () => {
-            // A real build grabs a frame and computes redness over the ROI.
-            // Prototype: synthesize a plausible next reading near the last one.
+          onclick: async () => {
+            // Score is still synthesized (redness-of-ROI computation is future
+            // work); the captured frame, when present, is the real image.
             const base = store.state.pallor[0]?.pallorScore ?? 0.42;
             const jitter =
               Math.round((totalSymptomScore(store.state.todayItems) % 7) - 3) / 100;
-            const score = clamp(base + jitter, 0.2, 0.8);
-            store.commit((s) => {
-              s.pallor.unshift({
-                id: `p${s.pallor.length + 1}`,
-                capturedAt: new Date(),
-                eye: 'right',
-                pallorScore: Number(score.toFixed(2)),
-                img: pallorSwatch(score),
+            const score = Number(clamp(base + jitter, 0.2, 0.8).toFixed(2));
+            const frame = stream ? await captureFrame(video) : null;
+
+            if (frame && USE_API) {
+              // Real path: upload the encrypted image, then show the API record.
+              try {
+                const form = new FormData();
+                form.append('image', frame, 'eye.jpg');
+                form.append('pallorScore', String(score));
+                form.append('eye', 'right');
+                const entry = await api.uploadPallor(form);
+                store.commit((s) => s.pallor.unshift(pallorToStore([entry])[0]));
+                toast('Reading saved');
+              } catch {
+                toast('Upload failed');
+              }
+            } else {
+              // Offline / no-camera fallback: local reading with a preview image.
+              const img = frame ? URL.createObjectURL(frame) : pallorSwatch(score);
+              store.commit((s) => {
+                s.pallor.unshift({
+                  id: `p${s.pallor.length + 1}`,
+                  capturedAt: new Date(),
+                  eye: 'right',
+                  pallorScore: score,
+                  img,
+                });
               });
-            });
+              toast('Reading saved');
+              if (USE_API) {
+                api
+                  .createPallor({ pallorScore: score, eye: 'right' })
+                  .catch(() => toast('Sync failed'));
+              }
+            }
+
             if (stream) stream.getTracks().forEach((t) => t.stop());
             closeSheet();
-            toast('Reading saved');
-            if (USE_API) {
-              api
-                .createPallor({ pallorScore: Number(score.toFixed(2)), eye: 'right' })
-                .catch(() => toast('Sync failed'));
-            }
           },
         },
         'Take photo',

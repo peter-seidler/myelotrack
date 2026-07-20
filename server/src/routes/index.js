@@ -19,7 +19,8 @@ export function apiRouter() {
   r.get('/labs', labs.list);
 
   r.get('/pallor', pallor.list);
-  r.post('/pallor', pallor.create);
+  r.post('/pallor', pallor.uploadImage, pallor.create);
+  r.get('/pallor/:id/image', pallor.image);
 
   r.get('/integrations/status', integrations.status);
   r.get('/integrations/:source/connect', integrations.connect);

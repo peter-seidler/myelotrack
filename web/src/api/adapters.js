@@ -1,4 +1,5 @@
 import { pallorSwatch } from '../lib/pallor-image.js';
+import { API_BASE } from '../config.js';
 
 /**
  * Map API response shapes onto the client store's shapes. The API returns
@@ -55,14 +56,20 @@ export function medsToStore(apiMeds) {
   }));
 }
 
-/** Map API pallor readings to the store shape, synthesizing a display image. */
+/**
+ * Map API pallor readings to the store shape. Readings with a stored image use
+ * the decrypted-image endpoint; metadata-only ones fall back to a synthesized
+ * swatch so the gallery still renders.
+ */
 export function pallorToStore(apiPallor) {
   return apiPallor.map((p) => ({
     id: p._id,
     capturedAt: new Date(p.capturedAt),
     eye: p.eye || 'right',
     pallorScore: p.pallorScore,
-    img: pallorSwatch(p.pallorScore ?? 0.42),
+    img: p.storage?.key
+      ? `${API_BASE}/api/v1/pallor/${p._id}/image`
+      : pallorSwatch(p.pallorScore ?? 0.42),
   }));
 }
 

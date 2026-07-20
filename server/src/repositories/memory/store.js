@@ -110,14 +110,18 @@ export function createMemoryRepository() {
     },
     addPallorPhoto(entry) {
       const record = {
-        _id: `p_${Date.now()}`,
+        _id: `p_${Date.now()}_${db.pallorPhotos.length}`,
         capturedAt: entry.capturedAt ? new Date(entry.capturedAt) : new Date(),
         eye: entry.eye || 'right',
         pallorScore: entry.pallorScore ?? null,
         note: entry.note || '',
+        storage: entry.storage || null,
       };
       db.pallorPhotos.unshift(record);
       return record;
+    },
+    getPallorPhoto(id) {
+      return db.pallorPhotos.find((p) => p._id === id) || null;
     },
 
     // --- Integrations ---
