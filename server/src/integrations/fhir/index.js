@@ -57,14 +57,5 @@ export function normalizeObservation(obs, source) {
   };
 }
 
-/**
- * Pull labs from a source and upsert normalized results. Not yet wired —
- * requires the SMART OAuth flow and per-source client registration.
- */
-// eslint-disable-next-line no-unused-vars
-export async function syncSource(source, repo) {
-  throw new Error(
-    `FHIR sync for "${source}" is not configured. Complete SMART OAuth setup ` +
-      `(see docs/architecture.md) before enabling live sync.`,
-  );
-}
+// SMART auth helpers live in ./smart.js; the fetch + normalize + upsert
+// pipeline lives in ./sync.js (both fetch-injectable and unit-tested).

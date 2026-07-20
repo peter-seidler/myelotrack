@@ -22,6 +22,8 @@ export function apiRouter() {
   r.post('/pallor', pallor.create);
 
   r.get('/integrations/status', integrations.status);
+  r.get('/integrations/:source/connect', integrations.connect);
+  r.get('/integrations/:source/callback', integrations.callback);
   r.post('/integrations/:source/sync', integrations.sync);
 
   return r;

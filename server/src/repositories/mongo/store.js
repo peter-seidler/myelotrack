@@ -92,6 +92,24 @@ export async function createMongoRepository(uri) {
     listAnalytes() {
       return LabResult.distinct('analyte', { userId });
     },
+    async upsertLabResults(results = []) {
+      if (!results.length) return 0;
+      const ops = results.map((r) => {
+        const externalId = r.provenance?.externalId;
+        if (externalId) {
+          return {
+            updateOne: {
+              filter: { userId, 'provenance.externalId': externalId },
+              update: { $set: { ...r, userId } },
+              upsert: true,
+            },
+          };
+        }
+        return { insertOne: { document: { ...r, userId } } };
+      });
+      await LabResult.bulkWrite(ops, { ordered: false });
+      return results.length;
+    },
 
     listPallor() {
       return lean(PallorPhoto.find({ userId }).sort({ capturedAt: -1 }));
@@ -121,6 +139,16 @@ export async function createMongoRepository(uri) {
       return (
         doc && { source: doc.source, status: doc.status, lastSyncAt: doc.lastSyncAt }
       );
+    },
+    getConnection(source) {
+      return IntegrationConnection.findOne({ userId, source }).lean();
+    },
+    async updateConnection(source, patch) {
+      return IntegrationConnection.findOneAndUpdate(
+        { userId, source },
+        { $set: { ...patch, userId, source } },
+        { upsert: true, new: true, setDefaultsOnInsert: true },
+      ).lean();
     },
 
     recordAudit(entry) {
