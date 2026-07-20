@@ -4,10 +4,23 @@ import * as medications from '../controllers/medications.js';
 import * as labs from '../controllers/labs.js';
 import * as pallor from '../controllers/pallor.js';
 import * as integrations from '../controllers/integrations.js';
+import * as auth from '../controllers/auth.js';
+import { requireAuth } from '../middleware/auth.js';
 
 /** Mount the v1 API surface (see docs/architecture.md). */
 export function apiRouter() {
   const r = Router();
+
+  // --- Auth (public: this is how you sign in) ---
+  r.get('/auth/me', auth.me);
+  r.post('/auth/logout', auth.logout);
+  r.get('/auth/registration/options', auth.registrationOptions);
+  r.post('/auth/registration/verify', auth.registrationVerify);
+  r.get('/auth/authentication/options', auth.authenticationOptions);
+  r.post('/auth/authentication/verify', auth.authenticationVerify);
+
+  // Everything below requires a session when AUTH_REQUIRED=true (no-op otherwise).
+  r.use(requireAuth);
 
   r.get('/symptoms', symptoms.list);
   r.post('/symptoms', symptoms.create);

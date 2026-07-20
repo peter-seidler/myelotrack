@@ -174,6 +174,32 @@ export async function createMongoRepository(uri) {
       ).lean();
     },
 
+    // --- Auth (passkeys) ---
+    setAuthChallenge(challenge) {
+      return User.updateOne({ _id: userId }, { $set: { currentChallenge: challenge } });
+    },
+    async getAuthChallenge() {
+      const u = await User.findById(userId).lean();
+      return u?.currentChallenge || null;
+    },
+    async listCredentials() {
+      const u = await User.findById(userId).lean();
+      return u?.credentials || [];
+    },
+    async getCredential(id) {
+      const u = await User.findById(userId).lean();
+      return (u?.credentials || []).find((c) => c.id === id) || null;
+    },
+    addCredential(cred) {
+      return User.updateOne({ _id: userId }, { $push: { credentials: cred } });
+    },
+    updateCredentialCounter(id, counter) {
+      return User.updateOne(
+        { _id: userId, 'credentials.id': id },
+        { $set: { 'credentials.$.counter': counter } },
+      );
+    },
+
     recordAudit(entry) {
       // Fire-and-forget for the middleware (it does not await); returns the
       // promise so callers/tests that want to await the write can.
