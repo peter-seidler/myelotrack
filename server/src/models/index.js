@@ -59,12 +59,23 @@ const medicationSchema = new Schema(
       daysOfWeek: [Number],
     },
     purpose: String,
+    rxnorm: String,
     prescriber: { careTeam: String, name: String },
     active: { type: Boolean, default: true },
     startedAt: Date,
     stoppedAt: Date,
+    source: { type: String, enum: ['msk', 'capital-health', 'apple-health', 'manual'] },
+    provenance: provenanceSchema,
   },
   opts,
+);
+// Idempotent upsert key for FHIR-sourced medications (manual ones exempt).
+medicationSchema.index(
+  { userId: 1, 'provenance.externalId': 1 },
+  {
+    unique: true,
+    partialFilterExpression: { 'provenance.externalId': { $type: 'string' } },
+  },
 );
 
 const doseLogSchema = new Schema(

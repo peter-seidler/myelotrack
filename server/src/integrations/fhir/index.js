@@ -57,5 +57,47 @@ export function normalizeObservation(obs, source) {
   };
 }
 
+const RXNORM_SYSTEM = 'rxnorm';
+
+/**
+ * Normalize a FHIR R4 `MedicationRequest` into MyeloTrack's medication shape.
+ * Returns null if there's no usable name.
+ *
+ * @param {object} mr - a FHIR MedicationRequest resource
+ * @param {string} source - 'msk' | 'capital-health'
+ * @returns {object|null}
+ */
+export function normalizeMedicationRequest(mr, source) {
+  const concept = mr?.medicationCodeableConcept;
+  const coding = concept?.coding?.[0];
+  const name = concept?.text || coding?.display;
+  if (!name) return null;
+
+  const dosage = mr.dosageInstruction?.[0] || {};
+  // Epic populates the human-readable dosage text; times may be in timing.
+  const times = (dosage.timing?.repeat?.timeOfDay || [])
+    .map((t) => String(t).slice(0, 5)) // "08:00:00" → "08:00"
+    .filter(Boolean);
+  const rxnorm = concept?.coding?.find((c) =>
+    c.system?.toLowerCase().includes(RXNORM_SYSTEM),
+  )?.code;
+
+  return {
+    name,
+    brand: '',
+    dose: dosage.text || '',
+    purpose: mr.reasonCode?.[0]?.text || '',
+    rxnorm,
+    schedule: { times },
+    active: mr.status === 'active',
+    source,
+    provenance: {
+      system: 'epic-fhir-r4',
+      resourceType: 'MedicationRequest',
+      externalId: mr.id ? `MedicationRequest/${mr.id}` : undefined,
+    },
+  };
+}
+
 // SMART auth helpers live in ./smart.js; the fetch + normalize + upsert
 // pipeline lives in ./sync.js (both fetch-injectable and unit-tested).
