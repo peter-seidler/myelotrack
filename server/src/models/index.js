@@ -102,9 +102,15 @@ const labResultSchema = new Schema(
   opts,
 );
 labResultSchema.index({ userId: 1, analyte: 1, collectedAt: -1 });
+// Idempotent upsert key for FHIR-sourced results. A partial index (not sparse)
+// so uniqueness applies ONLY to docs that actually carry a string externalId —
+// manually entered results (no externalId) are exempt and may repeat.
 labResultSchema.index(
   { userId: 1, 'provenance.externalId': 1 },
-  { unique: true, sparse: true },
+  {
+    unique: true,
+    partialFilterExpression: { 'provenance.externalId': { $type: 'string' } },
+  },
 );
 
 const pallorPhotoSchema = new Schema(

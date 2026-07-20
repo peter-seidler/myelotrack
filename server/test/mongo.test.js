@@ -92,6 +92,26 @@ describe('mongo repository', { skip: uri ? false : 'MONGODB_TEST_URI not set' },
     assert.ok(analytes.includes('hemoglobin') && analytes.includes('platelets'));
   });
 
+  it('dedupes FHIR results by externalId but lets manual results repeat', async () => {
+    await LabResult.syncIndexes(); // ensure the partial unique index is built
+    const fhir = {
+      userId,
+      analyte: 'hemoglobin',
+      value: 9.0,
+      source: 'msk',
+      provenance: { externalId: 'Observation/dup-1' },
+    };
+    await LabResult.create(fhir);
+    // Same externalId → rejected (idempotent upsert guard).
+    await assert.rejects(
+      () => LabResult.create({ ...fhir, value: 8.5 }),
+      /duplicate|E11000/i,
+    );
+    // Manual entries carry no externalId → the partial index ignores them.
+    await LabResult.create({ userId, analyte: 'hemoglobin', value: 7, source: 'manual' });
+    await LabResult.create({ userId, analyte: 'hemoglobin', value: 6, source: 'manual' });
+  });
+
   it('logs a dose for a real medication and rejects an unknown one', async () => {
     const med = await Medication.create({
       userId,
