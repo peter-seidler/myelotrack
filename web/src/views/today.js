@@ -4,6 +4,8 @@ import { toast } from '../ui/toast.js';
 import { makeDoseCheck } from '../ui/dose-check.js';
 import { SYMPTOM_ITEMS, totalSymptomScore, symptomBand } from '../data/symptoms.js';
 import { todaysDoses } from '../data/meds.js';
+import { api } from '../api/client.js';
+import { USE_API } from '../config.js';
 
 /** Render the Today tab: MPN-SAF check-in, weight, and today's due meds. */
 export function renderToday(container) {
@@ -166,6 +168,14 @@ export function renderToday(container) {
             s.todaySubmitted = true;
           });
           toast('Check-in saved');
+          if (USE_API) {
+            api
+              .createSymptom({
+                items: { ...state.todayItems },
+                weightKg: state.todayWeight,
+              })
+              .catch(() => toast('Sync failed'));
+          }
         },
       },
       state.todaySubmitted ? '✓ Logged for today' : "Save today's check-in",

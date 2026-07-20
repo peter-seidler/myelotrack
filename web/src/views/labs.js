@@ -13,6 +13,19 @@ export function renderLabs(container) {
   const { labs } = store.state;
   clear(container);
 
+  const analyteKeys = Object.keys(labs);
+  if (analyteKeys.length === 0) {
+    container.append(
+      el(
+        'div',
+        { class: 'empty' },
+        'No lab results yet — connect a care team to sync labs.',
+      ),
+    );
+    return;
+  }
+  if (!labs[activeAnalyte]) activeAnalyte = analyteKeys[0];
+
   // --- Analyte chips ---
   const tabs = el('div', { class: 'lab-tabs' });
   for (const key of Object.keys(labs)) {

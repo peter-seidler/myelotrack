@@ -7,9 +7,11 @@ import { store } from './state/store.js';
 import { fmtDate } from './lib/format.js';
 import { initSheet } from './ui/sheet.js';
 import { initRouter } from './router.js';
+import { toast } from './ui/toast.js';
+import { USE_API } from './config.js';
 
-/** Bootstrap the app: fill chrome, wire the sheet, start the router. */
-function main() {
+/** Bootstrap the app: fill chrome, hydrate (if configured), start the router. */
+async function main() {
   const { user } = store.state;
   $('#navDate').textContent = fmtDate(new Date(), {
     weekday: 'short',
@@ -19,6 +21,18 @@ function main() {
   $('#navAvatar').textContent = user.initials;
 
   initSheet();
+
+  // When an API base is configured, replace the seed with live data. On any
+  // failure, keep the already-loaded seed so the app still works offline.
+  if (USE_API) {
+    try {
+      await store.hydrate();
+    } catch (err) {
+      console.warn('API hydrate failed — using sample data', err);
+      toast('Offline — showing sample data');
+    }
+  }
+
   initRouter();
 }
 
