@@ -30,6 +30,9 @@ export const config = {
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean),
+  // Where to send the browser after a successful OAuth callback. When unset,
+  // the callback returns JSON instead of redirecting (used by tests).
+  appUrl: process.env.APP_URL || '',
   // 32-byte base64 key for encrypting OAuth tokens + pallor images at rest.
   // Required before any real integration connects or image upload; unset in the
   // default seeded/dev setup.
