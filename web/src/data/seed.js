@@ -33,6 +33,19 @@ export function buildInitialState() {
     todayWeight: 71.2,
     todaySubmitted: false,
 
+    // Other daily diagnostics (Vitals + Notes sub-tabs).
+    todayVitals: {
+      temperature: 37.0, // °C
+      heartRate: 74, // bpm
+      bpSystolic: 122, // mmHg
+      bpDiastolic: 78, // mmHg
+      spo2: 97, // %
+      spleenCm: 4, // cm palpable below the left costal margin
+    },
+    todayNote: '',
+    todaySleepHours: 6.5,
+    todayEnergy: 5, // 0–10
+
     // Recent daily totals (0–100), oldest→newest; today is appended on save.
     symptomHistory: [46, 52, 49, 41, 44, 38, 43],
 

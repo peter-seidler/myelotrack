@@ -61,7 +61,7 @@ export function renderPallor(container) {
           <span style="font-size:15px;color:var(--label-2);font-weight:500">/ 100 redness</span></div>
       </div>
       <div style="text-align:right">
-        <div class="pill" style="color:${trend < 0 ? 'var(--orange)' : 'var(--green)'};background:rgba(255,255,255,0.06)">
+        <div class="pill" style="color:${trend < 0 ? 'var(--orange)' : 'var(--green)'};background:var(--bg-elev-2)">
           ${trend < 0 ? '▼ paler' : '▲ pinker'} ${Math.abs(Math.round(trend * 100))}</div>
       </div>
     </div>
