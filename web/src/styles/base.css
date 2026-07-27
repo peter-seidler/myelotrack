@@ -75,9 +75,7 @@ textarea {
   top: 0;
   z-index: 40;
   padding: calc(var(--safe-top) + 8px) 20px 0;
-  background: var(--chrome-bg);
-  -webkit-backdrop-filter: var(--nav-blur);
-  backdrop-filter: var(--nav-blur);
+  background: var(--bg-elev);
   transition: box-shadow 0.2s;
 }
 .navbar.scrolled {
@@ -145,11 +143,9 @@ textarea {
 @keyframes fade {
   from {
     opacity: 0;
-    transform: translateY(6px);
   }
   to {
     opacity: 1;
-    transform: none;
   }
 }
 
