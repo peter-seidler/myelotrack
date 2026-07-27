@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1"
     />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#f2f2f7" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -14,7 +14,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <script type="module" src="/src/main.js"></script>
@@ -24,7 +24,26 @@
       <!-- Large-title nav bar -->
       <header class="navbar" id="navbar">
         <div class="eyebrow">
-          <span class="date" id="navDate"></span>
+          <div class="brand-left">
+            <span class="brand-logo" role="img" aria-label="MSK">
+              <svg
+                viewBox="0 0 40 44"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="4" y="2.5" width="32" height="39" rx="13" />
+                <path d="M13 18 L20 10.5 L27 18" />
+                <path d="M20 10.5 V32" />
+                <path d="M15 22 H25" />
+                <path d="M13.5 26.5 H26.5" />
+                <path d="M12 31 H28" />
+              </svg>
+            </span>
+            <span class="date" id="navDate"></span>
+          </div>
           <div class="avatar" id="navAvatar">PS</div>
         </div>
         <h1 class="large-title" id="navTitle">Today</h1>

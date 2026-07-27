@@ -1,30 +1,38 @@
-/* Design tokens — iOS dark system palette + shared scales. */
+/* Design tokens — iOS light system palette + shared scales. */
 :root {
   /* Surfaces */
-  --bg: #000000;
-  --bg-elev: #1c1c1e;
-  --bg-elev-2: #2c2c2e;
-  --separator: rgba(84, 84, 88, 0.6);
-  --separator-op: rgba(84, 84, 88, 0.34);
+  --page-bg: #e4e4ea; /* behind the device frame on desktop */
+  --bg: #f2f2f7; /* app background (iOS grouped) */
+  --bg-elev: #ffffff; /* cards, sheets */
+  --bg-elev-2: #e9e9ef; /* tracks, secondary fills */
+  --separator: rgba(60, 60, 67, 0.29);
+  --separator-op: rgba(60, 60, 67, 0.16);
+  --hairline: rgba(0, 0, 0, 0.06); /* card borders */
+  --track: rgba(0, 0, 0, 0.08); /* dial / progress backing */
+  --chrome-bg: rgba(255, 255, 255, 0.8); /* translucent nav + tab bar */
 
   /* Labels */
-  --label: #ffffff;
-  --label-2: rgba(235, 235, 245, 0.6);
-  --label-3: rgba(235, 235, 245, 0.3);
-  --label-4: rgba(235, 235, 245, 0.18);
+  --label: #1c1c1e;
+  --label-2: rgba(60, 60, 67, 0.6);
+  --label-3: rgba(60, 60, 67, 0.3);
+  --label-4: rgba(60, 60, 67, 0.18);
+  --on-accent: #ffffff; /* text / icons on a filled accent */
+  --msk-blue: #16336e; /* MSK dark blue — headlines + brand mark */
 
-  /* System colors (dark) */
-  --blue: #0a84ff;
-  --green: #30d158;
-  --red: #ff453a;
-  --orange: #ff9f0a;
-  --yellow: #ffd60a;
-  --purple: #bf5af2;
-  --pink: #ff375f;
-  --teal: #40c8e0;
-  --indigo: #5e5ce6;
+  /* System colors (light) */
+  --blue: #007aff;
+  --green: #34c759;
+  --red: #ff3b30;
+  --orange: #ff9500;
+  --yellow: #f5c518;
+  --purple: #af52de;
+  --pink: #ff2d55;
+  --teal: #30b0c7;
+  --indigo: #5856d6;
 
   /* Effects & geometry */
+  --thumb-shadow: rgba(0, 0, 0, 0.22);
+  --overlay: rgba(0, 0, 0, 0.4);
   --nav-blur: saturate(180%) blur(20px);
   --radius: 14px;
   --radius-lg: 20px;

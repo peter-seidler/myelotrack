@@ -24,7 +24,7 @@ export function renderToday(container) {
   hero.innerHTML = `
     <div class="dial">
       <svg width="110" height="110" viewBox="0 0 110 110">
-        <circle cx="55" cy="55" r="${radius}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="9"/>
+        <circle cx="55" cy="55" r="${radius}" fill="none" stroke="var(--track)" stroke-width="9"/>
         <circle cx="55" cy="55" r="${radius}" fill="none" stroke="${band.color}" stroke-width="9"
           stroke-linecap="round" stroke-dasharray="${circumference}"
           stroke-dashoffset="${circumference * (1 - total / 100)}"/>

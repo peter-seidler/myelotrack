@@ -14,7 +14,7 @@
   border-radius: var(--radius-lg);
   padding: 16px;
   margin-bottom: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--hairline);
 }
 .card.tight {
   padding: 0;
@@ -73,20 +73,20 @@
   border-radius: 50%;
 }
 .pill.src-msk {
-  color: #7fb4ff;
-  background: rgba(10, 132, 255, 0.14);
+  color: #0063cc;
+  background: rgba(0, 122, 255, 0.12);
 }
 .pill.src-capital-health {
-  color: #5ee0a0;
-  background: rgba(48, 209, 88, 0.14);
+  color: #1a8f4a;
+  background: rgba(52, 199, 89, 0.16);
 }
 .pill.src-apple-health {
-  color: #e0e0e6;
-  background: rgba(235, 235, 245, 0.1);
+  color: #3a3a3c;
+  background: rgba(60, 60, 67, 0.1);
 }
 .pill.src-manual {
-  color: #d9b3ff;
-  background: rgba(191, 90, 242, 0.14);
+  color: #8944d6;
+  background: rgba(175, 82, 222, 0.14);
 }
 
 /* Clinical flag colors */
@@ -112,7 +112,7 @@
   border: none;
   border-radius: var(--radius);
   background: var(--blue);
-  color: #fff;
+  color: var(--on-accent);
   font-size: 17px;
   font-weight: 600;
   transition:
@@ -141,8 +141,8 @@
 
 /* Today — hero score dial */
 .hero {
-  background: linear-gradient(160deg, #2a2140, #161422 70%);
-  border: 1px solid rgba(191, 90, 242, 0.18);
+  background: linear-gradient(160deg, #eceaff, #ffffff 72%);
+  border: 1px solid rgba(88, 86, 214, 0.18);
   border-radius: 24px;
   padding: 20px;
   margin-bottom: 16px;
@@ -231,16 +231,17 @@ input[type='range']::-webkit-slider-thumb {
   height: 26px;
   border-radius: 50%;
   background: #fff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 4px var(--thumb-shadow);
   cursor: grab;
 }
 input[type='range']::-moz-range-thumb {
   width: 26px;
   height: 26px;
-  border: none;
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
   border-radius: 50%;
   background: #fff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 1px 4px var(--thumb-shadow);
 }
 
 /* Meds */
@@ -254,7 +255,7 @@ input[type='range']::-moz-range-thumb {
   padding: 0;
   display: grid;
   place-items: center;
-  color: #fff;
+  color: var(--on-accent);
   font-size: 15px;
   transition: 0.15s;
 }
@@ -303,8 +304,8 @@ input[type='range']::-moz-range-thumb {
   white-space: nowrap;
 }
 .chip.active {
-  background: #fff;
-  color: #000;
+  background: var(--label);
+  color: var(--bg-elev);
 }
 .chart-val {
   display: flex;
@@ -377,6 +378,7 @@ svg.spark {
   bottom: 0;
   padding: 20px 10px 8px;
   font-size: 11px;
+  color: #fff;
   background: linear-gradient(transparent, rgba(0, 0, 0, 0.75));
   display: flex;
   justify-content: space-between;
@@ -391,7 +393,7 @@ svg.spark {
   position: fixed;
   inset: 0;
   z-index: 80;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--overlay);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.25s;
@@ -447,7 +449,7 @@ svg.spark {
   bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 20px);
   transform: translate(-50%, 20px);
   z-index: 90;
-  background: var(--bg-elev-2);
+  background: #2c2c2e;
   color: #fff;
   padding: 11px 18px;
   border-radius: 100px;
@@ -456,7 +458,7 @@ svg.spark {
   opacity: 0;
   pointer-events: none;
   transition: 0.25s;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.28);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 .toast.show {
