@@ -14,6 +14,7 @@ export function buildInitialState() {
     user: {
       displayName: 'Peter Seidler',
       initials: 'PS',
+      dob: '1963-06-20',
       condition: 'Myelofibrosis · MDS overlap',
     },
 
