@@ -120,3 +120,67 @@ export function lineChart(analyte, analyteKey) {
 
   return svg;
 }
+
+/**
+ * A lightweight sparkline for a plain number series (no source or reference
+ * band). Draws in `currentColor`, so set the returned SVG's `color` to tone it.
+ *
+ * @param {number[]} values - oldest → newest
+ * @param {{ min?: number, max?: number, height?: number }} [opts]
+ * @returns {SVGSVGElement}
+ */
+export function sparkline(values, opts = {}) {
+  const W = 360;
+  const H = opts.height || 88;
+  const padX = 8;
+  const padY = 12;
+  const min = opts.min ?? Math.min(...values);
+  const max = opts.max ?? Math.max(...values);
+  const range = max - min || 1;
+  const x = (i) => padX + (i / Math.max(1, values.length - 1)) * (W - padX * 2);
+  const y = (v) => padY + (1 - (v - min) / range) * (H - padY * 2);
+
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('class', 'spark');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+  const linePath = values
+    .map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(v).toFixed(1)}`)
+    .join(' ');
+
+  const defs = document.createElementNS(SVG_NS, 'defs');
+  defs.innerHTML = `<linearGradient id="spark_grad" x1="0" x2="0" y1="0" y2="1">
+    <stop offset="0%" stop-color="currentColor" stop-opacity="0.26"/>
+    <stop offset="100%" stop-color="currentColor" stop-opacity="0"/></linearGradient>`;
+  svg.append(defs);
+
+  const add = (tag, attrs) => {
+    const node = document.createElementNS(SVG_NS, tag);
+    for (const key in attrs) node.setAttribute(key, attrs[key]);
+    svg.append(node);
+    return node;
+  };
+
+  add('path', {
+    d: `${linePath} L ${x(values.length - 1)} ${H} L ${x(0)} ${H} Z`,
+    fill: 'url(#spark_grad)',
+    stroke: 'none',
+  });
+  add('path', {
+    d: linePath,
+    fill: 'none',
+    stroke: 'currentColor',
+    'stroke-width': 2.5,
+    'stroke-linejoin': 'round',
+    'stroke-linecap': 'round',
+  });
+  add('circle', {
+    cx: x(values.length - 1),
+    cy: y(values[values.length - 1]),
+    r: 5,
+    fill: 'var(--bg-elev)',
+    stroke: 'currentColor',
+    'stroke-width': 3,
+  });
+  return svg;
+}
