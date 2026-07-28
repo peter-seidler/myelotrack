@@ -1,0 +1,61 @@
+name: Deploy to Cloud Run
+
+# Auto-deploy main to Cloud Run after a merge. Dormant until enabled: the job
+# is gated on the repo variable DEPLOY_ENABLED == 'true', so until you opt in
+# this workflow is skipped (never a red build). See docs/deploy.md → "Turn on
+# auto-deploy" for the one-time setup.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Never run two deploys at once; let an in-flight deploy finish.
+concurrency:
+  group: deploy-cloud-run
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build + deploy (Cloud Run)
+    # Repo variables ARE available to `if:` (secrets are not). Set
+    # DEPLOY_ENABLED=true once GCP_SA_KEY + GCP_PROJECT_ID secrets exist.
+    if: ${{ vars.DEPLOY_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SERVICE: myelotrack
+      REGION: ${{ vars.GCP_REGION || 'us-east1' }}
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      # Builds the image from the Dockerfile via Cloud Build, then deploys a
+      # new revision. Flags not passed here (scaling, secrets, service account,
+      # Atlas URI) are preserved from the existing service — the first manual
+      # `gcloud run deploy` establishes that full config (see docs/deploy.md).
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy "$SERVICE" \
+            --source . \
+            --project="${{ secrets.GCP_PROJECT_ID }}" \
+            --region="$REGION" \
+            --quiet
+
+      - name: Report service URL
+        run: |
+          URL=$(gcloud run services describe "$SERVICE" \
+            --region="$REGION" --project="${{ secrets.GCP_PROJECT_ID }}" \
+            --format='value(status.url)')
+          echo "Deployed: $URL"
+          echo "### Deployed to $URL" >> "$GITHUB_STEP_SUMMARY"

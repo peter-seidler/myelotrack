@@ -24,6 +24,11 @@ function fhirSource(prefix) {
 
 export const config = {
   port: Number(process.env.PORT) || 8787,
+  // Absolute path to the built web client (web/dist). When set, the API also
+  // serves the PWA from the same origin — the single-service production
+  // topology (see Dockerfile). Unset in dev/tests, where the web dev server
+  // hosts the client separately.
+  webDir: process.env.WEB_DIR || '',
   dataBackend: process.env.DATA_BACKEND || 'memory',
   mongoUri: process.env.MONGODB_URI || 'mongodb://localhost:27017/myelotrack',
   corsOrigins: (process.env.CORS_ORIGINS || 'http://localhost:5173')
