@@ -692,6 +692,79 @@ svg.spark {
   margin-top: 10px;
 }
 
+/* Onboarding (first-run overlay, reuses .auth-gate) */
+.onb-dots {
+  display: flex;
+  gap: 7px;
+  justify-content: center;
+  margin-top: 22px;
+}
+.onb-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--label-4);
+}
+.onb-dot.on {
+  background: var(--msk-blue);
+}
+.onb-consent {
+  text-align: left;
+  background: var(--bg-elev);
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+.onb-consent p {
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: var(--label-2);
+  line-height: 1.45;
+}
+.onb-consent ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 14px;
+  color: var(--label-2);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.onb-agree {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+.onb-agree input {
+  width: 20px;
+  height: 20px;
+}
+.onb-field {
+  text-align: left;
+  margin-bottom: 14px;
+}
+.onb-field label {
+  display: block;
+  font-size: 13px;
+  color: var(--label-2);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.onb-control {
+  width: 100%;
+  font-family: 'Inter Tight';
+  font-size: 16px;
+  color: var(--label);
+  background: var(--bg-elev-2);
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  padding: 12px;
+}
+
 /* Toast */
 .toast {
   position: fixed;
