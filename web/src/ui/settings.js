@@ -5,13 +5,97 @@ import { api } from '../api/client.js';
 import { USE_API } from '../config.js';
 import { store } from '../state/store.js';
 import { SOURCES } from '../data/sources.js';
+import { MPN_SUBTYPES } from '../data/risk.js';
 import { fmtDate } from '../lib/format.js';
 
 const FHIR_SOURCES = ['msk', 'capital-health'];
 
-/** Open the "Care teams" settings sheet: connection status + connect/sync. */
+/** A labelled row with a control on the right. */
+function field(label, control) {
+  return el('div', { class: 'field-row' }, [
+    el('div', { class: 'field-label' }, label),
+    control,
+  ]);
+}
+
+/** A <select> bound to `value`, calling `onChange` with the chosen value. */
+function selectControl(value, options, onChange) {
+  const sel = el(
+    'select',
+    { class: 'field-control', onchange: (e) => onChange(e.target.value) },
+    options.map((o) => el('option', { value: o.value }, o.label)),
+  );
+  sel.value = value;
+  return sel;
+}
+
+/** A yes/no control (kept a select for reliable touch behavior). */
+function yesNoControl(value, onChange) {
+  return selectControl(
+    value ? 'yes' : 'no',
+    [
+      { value: 'no', label: 'No' },
+      { value: 'yes', label: 'Yes' },
+    ],
+    (v) => onChange(v === 'yes'),
+  );
+}
+
+/** Clinical-profile section — the semi-static facts that feed the Score tab. */
+function renderProfile(sheet) {
+  const u = store.state.user;
+  const set = (patch) => store.commit((s) => Object.assign(s.user, patch));
+  sheet.append(
+    el('h2', {}, 'Clinical profile'),
+    el('p', { class: 'lede' }, 'These feed your risk score on the Score tab.'),
+  );
+  const card = el('div', { class: 'card tight' });
+  card.append(
+    field(
+      'MPN subtype',
+      selectControl(
+        u.mpnSubtype || 'PMF',
+        MPN_SUBTYPES.map((t) => ({ value: t.id, label: t.label })),
+        (v) => set({ mpnSubtype: v }),
+      ),
+    ),
+    field(
+      'Date of birth',
+      el('input', {
+        type: 'date',
+        class: 'field-control',
+        value: u.dob || '',
+        onchange: (e) => set({ dob: e.target.value }),
+      }),
+    ),
+    field(
+      'JAK2 V617F',
+      selectControl(
+        u.jak2 || 'unknown',
+        [
+          { value: 'positive', label: 'Positive' },
+          { value: 'negative', label: 'Negative' },
+          { value: 'unknown', label: 'Unknown' },
+        ],
+        (v) => set({ jak2: v }),
+      ),
+    ),
+    field(
+      'Prior thrombosis',
+      yesNoControl(!!u.priorThrombosis, (v) => set({ priorThrombosis: v })),
+    ),
+    field(
+      'Transfusion-dependent',
+      yesNoControl(!!u.transfusionDependent, (v) => set({ transfusionDependent: v })),
+    ),
+  );
+  sheet.append(card);
+}
+
+/** Open the settings sheet: clinical profile + care-team connections. */
 export function openSettingsSheet() {
   openSheet((sheet) => {
+    renderProfile(sheet);
     sheet.append(
       el('h2', {}, 'Care teams'),
       el(
