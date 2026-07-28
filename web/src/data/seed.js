@@ -14,8 +14,13 @@ export function buildInitialState() {
     user: {
       displayName: 'Peter Seidler',
       initials: 'PS',
-      dob: '1963-06-20',
       condition: 'Myelofibrosis · MDS overlap',
+      // Clinical profile — semi-static facts that feed the prognostic scores.
+      dob: '1963-06-20',
+      mpnSubtype: 'PMF', // PMF → DIPSS · ET → IPSET-thrombosis · PV → PV risk
+      jak2: 'positive', // positive | negative | unknown
+      priorThrombosis: false,
+      transfusionDependent: false,
     },
 
     // Today's working MPN-SAF TSS entry.
