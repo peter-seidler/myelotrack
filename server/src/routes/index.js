@@ -5,6 +5,7 @@ import * as labs from '../controllers/labs.js';
 import * as pallor from '../controllers/pallor.js';
 import * as integrations from '../controllers/integrations.js';
 import * as auth from '../controllers/auth.js';
+import * as account from '../controllers/account.js';
 import { requireAuth } from '../middleware/auth.js';
 
 /** Mount the v1 API surface (see docs/architecture.md). */
@@ -39,6 +40,10 @@ export function apiRouter() {
   r.get('/integrations/:source/connect', integrations.connect);
   r.get('/integrations/:source/callback', integrations.callback);
   r.post('/integrations/:source/sync', integrations.sync);
+
+  // Account: export everything, or erase it (honors the consent promise).
+  r.get('/account/export', account.exportData);
+  r.delete('/account', account.deleteAccount);
 
   return r;
 }
