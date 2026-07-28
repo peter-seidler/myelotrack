@@ -26,7 +26,9 @@ export function lineChart(analyte, analyteKey) {
     max = Math.max(6, Math.max(...values) + 1);
   }
   const range = max - min || 1;
-  const x = (i) => padX + (i / (points.length - 1)) * (W - padX * 2);
+  // Center a lone point; otherwise spread evenly (guard divide-by-zero).
+  const x = (i) =>
+    points.length === 1 ? W / 2 : padX + (i / (points.length - 1)) * (W - padX * 2);
   const y = (value) => padY + (1 - (value - min) / range) * (H - padY * 2);
 
   const svg = document.createElementNS(SVG_NS, 'svg');
