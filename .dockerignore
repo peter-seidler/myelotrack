@@ -1,0 +1,27 @@
+# Keep the build context small and — most importantly — keep PHI and secrets
+# out of the image.
+
+# Real patient data lives only in this git-ignored file; it must never be
+# baked into a built image. The deployed app uses sample seed data.
+web/src/data/local-seed.js
+
+# Dependencies + build outputs (reinstalled / rebuilt inside the image).
+node_modules
+**/node_modules
+web/dist
+server/.data
+
+# Secrets and local env.
+.env
+**/.env
+*.pem
+
+# VCS / CI / tooling.
+.git
+.github
+.gitignore
+
+# Misc.
+*.log
+coverage
+.DS_Store
