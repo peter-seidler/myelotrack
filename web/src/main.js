@@ -13,6 +13,7 @@ import { openSettingsSheet } from './ui/settings.js';
 import { SOURCES } from './data/sources.js';
 import { api } from './api/client.js';
 import { showAuthGate } from './ui/auth-gate.js';
+import { loadSavedProfile, needsOnboarding, showOnboarding } from './ui/onboarding.js';
 
 /** If we just returned from a care-team OAuth redirect, acknowledge + clean up. */
 function handleOAuthReturn() {
@@ -31,6 +32,8 @@ function handleOAuthReturn() {
 
 /** Bootstrap the app: fill chrome, hydrate (if configured), start the router. */
 async function main() {
+  // Apply any saved clinical profile before drawing chrome or scoring.
+  loadSavedProfile();
   const { user } = store.state;
   $('#navDate').textContent = fmtDate(new Date(), {
     weekday: 'short',
@@ -60,6 +63,9 @@ async function main() {
       toast('Offline — showing sample data');
     }
   }
+
+  // First run on this device: welcome, consent, and a quick clinical setup.
+  if (needsOnboarding()) await showOnboarding();
 
   initRouter();
 }
