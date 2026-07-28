@@ -186,6 +186,61 @@
   margin: 22px 0 6px;
 }
 
+/* Trends */
+.trend-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.trend-num {
+  font-family: 'Inter Tight';
+  font-weight: 700;
+  font-size: 34px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.trend-unit {
+  font-size: 15px;
+  color: var(--label-2);
+  font-weight: 500;
+}
+.trend-delta {
+  font-family: 'Inter Tight';
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.stat-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.stat {
+  flex: 1;
+  background: var(--bg-elev);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  padding: 12px 8px;
+  text-align: center;
+}
+.stat-v {
+  font-family: 'Inter Tight';
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.stat-k {
+  font-size: 11px;
+  color: var(--label-3);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 5px;
+}
+
 /* Score — DIPSS risk */
 .risk-hero {
   background: var(--bg-elev);
