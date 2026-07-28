@@ -58,6 +58,18 @@ the deployed app before any PHI is involved.
 
 ## Phase 1 — provision the infrastructure (one-time, needs your accounts)
 
+> **Shortcut.** Two things are yours alone: create the GCP project + link
+> billing (step 1 below) and create the Atlas cluster + **sign the BAA**
+> (step 2). After those, the rest is scripted:
+>
+> ```bash
+> PROJECT_ID=cognigenics-myelotrack REGION=us-east1 bash scripts/setup-gcp.sh
+> # add your Atlas URI to Secret Manager (the script prints the exact command)
+> PROJECT_ID=cognigenics-myelotrack REGION=us-east1 bash scripts/deploy.sh
+> ```
+>
+> The manual steps below are what those scripts run, for reference.
+
 ### 1. GCP project + APIs
 
 ```bash
