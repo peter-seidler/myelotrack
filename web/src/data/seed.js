@@ -2,6 +2,17 @@ import { daysAgo } from '../lib/format.js';
 import { pallorSwatch } from '../lib/pallor-image.js';
 import { buildLabs } from './labs.js';
 
+// Optional local data override (git-ignored `local-seed.js`) — lets you run the
+// app on your own real results without ever committing PHI. It's absent in CI
+// and for anyone who hasn't created it, so `import.meta.glob` resolves to an
+// empty object and the sample data below is used unchanged.
+const localModules = import.meta.glob('./local-seed.js', { eager: true });
+const localOverride = localModules['./local-seed.js']?.localState;
+
+function withLocalOverride(state) {
+  return typeof localOverride === 'function' ? localOverride(state) : state;
+}
+
 /**
  * Build the initial in-memory application state. Field names mirror the
  * backend API responses / MongoDB schema (see docs/), so swapping this seed
@@ -10,7 +21,7 @@ import { buildLabs } from './labs.js';
  * All data here is fake and lives only in memory — refresh resets it.
  */
 export function buildInitialState() {
-  return {
+  const state = {
     user: {
       displayName: 'Peter Seidler',
       initials: 'PS',
@@ -121,4 +132,5 @@ export function buildInitialState() {
       },
     ],
   };
+  return withLocalOverride(state);
 }
