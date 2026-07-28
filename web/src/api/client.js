@@ -46,6 +46,13 @@ export const api = {
   uploadPallor: (formData) =>
     request('/api/v1/pallor', { method: 'POST', body: formData }),
 
+  // Account (export / erasure)
+  // The export is a file download, so callers fetch this URL directly (with
+  // credentials) rather than going through `request` — the response is a raw
+  // document, not the usual { data } envelope.
+  exportUrl: () => `${API_BASE}/api/v1/account/export`,
+  deleteAccount: () => request('/api/v1/account', { method: 'DELETE' }),
+
   // Integrations (care teams)
   connectSource: (source) => request(`/api/v1/integrations/${source}/connect`),
   syncSource: (source) =>

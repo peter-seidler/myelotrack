@@ -134,6 +134,16 @@
   background: transparent;
   color: var(--blue);
 }
+.btn.danger {
+  background: transparent;
+  color: var(--red);
+}
+/* Compact button for trailing slots in list rows (e.g. Settings). */
+.btn.small {
+  width: auto;
+  padding: 8px 14px;
+  font-size: 15px;
+}
 .btn[disabled] {
   opacity: 0.45;
   pointer-events: none;
