@@ -26,3 +26,6 @@ coverage/
 # Local pallor image store (encrypted blobs — never commit PHI)
 .data/
 server/.data/
+
+# Local real-data override (PHI) — never commit
+web/src/data/local-seed.js
