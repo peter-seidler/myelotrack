@@ -211,6 +211,45 @@ export async function createMongoRepository(uri) {
       return lean(AuditLog.find({ userId }).sort({ at: -1 }));
     },
 
+    // --- Account: export & erasure ---
+    async exportData() {
+      const [symptoms, medications, doseLogs, labResults, pallor, integrations] =
+        await Promise.all([
+          lean(SymptomEntry.find({ userId }).sort({ date: -1 })),
+          lean(Medication.find({ userId })),
+          lean(DoseLog.find({ userId }).sort({ scheduledFor: -1 })),
+          lean(LabResult.find({ userId }).sort({ collectedAt: 1 })),
+          lean(PallorPhoto.find({ userId }).sort({ capturedAt: -1 })),
+          // Metadata only — the `tokens` subdocument (encrypted OAuth secrets)
+          // is never exported.
+          lean(
+            IntegrationConnection.find({ userId }).select(
+              'source system status scopes fhirBaseUrl lastSyncAt',
+            ),
+          ),
+        ]);
+      return { symptoms, medications, doseLogs, labResults, pallor, integrations };
+    },
+    async deleteAllData() {
+      const [symptoms, medications, doseLogs, labResults, pallor, integrations] =
+        await Promise.all([
+          SymptomEntry.deleteMany({ userId }),
+          Medication.deleteMany({ userId }),
+          DoseLog.deleteMany({ userId }),
+          LabResult.deleteMany({ userId }),
+          PallorPhoto.deleteMany({ userId }),
+          IntegrationConnection.deleteMany({ userId }),
+        ]);
+      return {
+        symptoms: symptoms.deletedCount,
+        medications: medications.deletedCount,
+        doseLogs: doseLogs.deletedCount,
+        labResults: labResults.deletedCount,
+        pallor: pallor.deletedCount,
+        integrations: integrations.deletedCount,
+      };
+    },
+
     computeFlag,
   };
 }

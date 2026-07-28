@@ -197,6 +197,57 @@ export function createMemoryRepository() {
       if (cred) cred.counter = counter;
     },
 
+    // --- Account: export & erasure ---
+    /**
+     * The patient's full record as plain data, for a "download my data"
+     * export. Integration connections are included as metadata only — never
+     * the encrypted OAuth tokens.
+     */
+    exportData() {
+      return {
+        symptoms: db.symptomEntries,
+        medications: db.medications,
+        doseLogs: db.doseLogs,
+        labResults: db.labResults,
+        pallor: db.pallorPhotos,
+        integrations: db.integrationConnections.map((c) => ({
+          source: c.source,
+          system: c.system,
+          status: c.status,
+          scopes: c.scopes,
+          fhirBaseUrl: c.fhirBaseUrl,
+          lastSyncAt: c.lastSyncAt,
+        })),
+      };
+    },
+    /**
+     * Erase all PHI for the patient (right to be forgotten). Clears each
+     * collection in place so existing references stay valid, and returns the
+     * per-collection counts removed. The passkey credential is intentionally
+     * kept so the patient can sign back into a now-empty app.
+     */
+    deleteAllData() {
+      const counts = {
+        symptoms: db.symptomEntries.length,
+        medications: db.medications.length,
+        doseLogs: db.doseLogs.length,
+        labResults: db.labResults.length,
+        pallor: db.pallorPhotos.length,
+        integrations: db.integrationConnections.length,
+      };
+      for (const key of [
+        'symptomEntries',
+        'medications',
+        'doseLogs',
+        'labResults',
+        'pallorPhotos',
+        'integrationConnections',
+      ]) {
+        db[key].length = 0;
+      }
+      return counts;
+    },
+
     // --- Audit ---
     recordAudit(entry) {
       db.auditLog.push(entry);

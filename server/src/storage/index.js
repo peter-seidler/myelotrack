@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { mkdir, writeFile, readFile } from 'node:fs/promises';
+import { mkdir, writeFile, readFile, unlink } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { config } from '../config/index.js';
 import { parseKey, encryptBuffer, decryptBuffer } from '../lib/crypto.js';
@@ -38,6 +38,9 @@ export function createStorage(opts = {}) {
         if (!enc) return null;
         return decryptBuffer(enc, key);
       },
+      async delete(objectKey) {
+        blobs.delete(objectKey);
+      },
     };
   }
 
@@ -60,6 +63,13 @@ export function createStorage(opts = {}) {
       } catch (err) {
         if (err.code === 'ENOENT') return null;
         throw err;
+      }
+    },
+    async delete(objectKey) {
+      try {
+        await unlink(pathFor(objectKey));
+      } catch (err) {
+        if (err.code !== 'ENOENT') throw err;
       }
     },
   };
