@@ -92,10 +92,129 @@ function renderProfile(sheet) {
   sheet.append(card);
 }
 
+/** Trigger a client-side download of a Blob under the given filename. */
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = el('a', { href: url, download: filename });
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/** Build an export document from the in-memory store (offline/sample mode). */
+function offlineExportDoc() {
+  const s = store.state;
+  return {
+    schemaVersion: 1,
+    generatedAt: new Date().toISOString(),
+    app: 'MyeloTrack',
+    note: 'Exported locally in sample/offline mode.',
+    records: {
+      user: s.user,
+      todayItems: s.todayItems,
+      symptomHistory: s.symptomHistory,
+      medications: s.medications,
+      labs: s.labs,
+      // Drop the inline image data URLs — keep the metadata only.
+      pallor: (s.pallor || []).map(({ img: _img, ...rest }) => rest),
+    },
+  };
+}
+
+async function exportData(event) {
+  const btn = event.currentTarget;
+  btn.disabled = true;
+  const stamp = new Date().toISOString().slice(0, 10);
+  const filename = `myelotrack-export-${stamp}.json`;
+  try {
+    if (USE_API) {
+      const res = await fetch(api.exportUrl(), { credentials: 'include' });
+      if (!res.ok) throw new Error(`export ${res.status}`);
+      downloadBlob(await res.blob(), filename);
+    } else {
+      const json = JSON.stringify(offlineExportDoc(), null, 2);
+      downloadBlob(new Blob([json], { type: 'application/json' }), filename);
+    }
+    toast('Data exported');
+  } catch {
+    toast('Export failed');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function deleteData(event) {
+  const ok = window.confirm(
+    'Permanently delete all your MyeloTrack data? This cannot be undone.',
+  );
+  if (!ok) return;
+  const btn = event.currentTarget;
+  btn.disabled = true;
+  btn.textContent = 'Deleting…';
+  try {
+    await api.deleteAccount();
+    toast('Your data was deleted');
+    // Reload so the app reflects the now-empty record.
+    setTimeout(() => window.location.reload(), 600);
+  } catch {
+    toast('Delete failed');
+    btn.disabled = false;
+    btn.textContent = 'Delete';
+  }
+}
+
+/** "Your data" section — export a copy, or erase everything (consent promise). */
+function renderDataControls(sheet) {
+  sheet.append(
+    el('h2', {}, 'Your data'),
+    el(
+      'p',
+      { class: 'lede' },
+      'Download a copy of everything, or permanently delete it.',
+    ),
+  );
+  const card = el('div', { class: 'card tight' });
+  card.append(
+    el('div', { class: 'row' }, [
+      el('div', { class: 'grow' }, [
+        el('div', { class: 'title' }, 'Export my data'),
+        el('div', { class: 'sub' }, 'Download all your records as a JSON file.'),
+      ]),
+      el('div', { class: 'trail' }, [
+        el('button', { class: 'btn small ghost', onclick: exportData }, 'Export'),
+      ]),
+    ]),
+  );
+  card.append(
+    el('div', { class: 'row' }, [
+      el('div', { class: 'grow' }, [
+        el('div', { class: 'title' }, 'Delete my data'),
+        el(
+          'div',
+          { class: 'sub' },
+          USE_API
+            ? 'Permanently erase your entire record.'
+            : 'Erasing your synced record needs the backend API.',
+        ),
+      ]),
+      ...(USE_API
+        ? [
+            el('div', { class: 'trail' }, [
+              el('button', { class: 'btn small danger', onclick: deleteData }, 'Delete'),
+            ]),
+          ]
+        : []),
+    ]),
+  );
+  sheet.append(card);
+}
+
 /** Open the settings sheet: clinical profile + care-team connections. */
 export function openSettingsSheet() {
   openSheet((sheet) => {
     renderProfile(sheet);
+    renderDataControls(sheet);
     sheet.append(
       el('h2', {}, 'Care teams'),
       el(
