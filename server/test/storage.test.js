@@ -36,3 +36,18 @@ test('local storage encrypts on disk and decrypts on read', async () => {
 test('createStorage requires an encryption key', () => {
   assert.throws(() => createStorage({ backend: 'memory', fieldEncryptionKey: '' }));
 });
+
+test('gcs backend exposes the storage interface without touching the network', () => {
+  // Constructing the gcs backend must not import the client or make any calls
+  // (that happens lazily on first put/get/delete), so this is safe in CI.
+  const store = createStorage({
+    backend: 'gcs',
+    bucket: 'test-bucket',
+    fieldEncryptionKey,
+  });
+  assert.equal(store.backend, 'gcs');
+  assert.equal(store.bucket, 'test-bucket');
+  for (const method of ['put', 'get', 'delete']) {
+    assert.equal(typeof store[method], 'function', `has ${method}()`);
+  }
+});

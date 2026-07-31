@@ -155,10 +155,12 @@ Once the service exists and the first manual deploy has set its config:
 
 ## Still ahead (later phases)
 
-- **GCS storage backend** for pallor images (Phase 1 code).
-- **Export + delete PHI** endpoints to honor the in-app consent promise.
 - **Real FHIR sources** — register Epic sandbox apps for MSK + Capital Health,
   then flip to live (the SMART-on-FHIR sync code already exists and is tested).
 - **iOS** — Capacitor wrapper around the same web build → App Store.
 - **Ops** — durable audit-log sink + retention, automated Atlas backups,
   uptime/error monitoring.
+
+Done since the first draft: the export/delete-PHI endpoints, and the **GCS
+storage backend** for pallor images — `deploy.sh` sets `STORAGE_BACKEND=gcs`
+and `setup-gcp.sh` grants the runtime service account access to the bucket.
