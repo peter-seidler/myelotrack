@@ -35,14 +35,17 @@ else
   HOST="${URL#https://}"
 fi
 
+BUCKET="${BUCKET:-${PROJECT_ID}-pallor}"
+STORAGE="STORAGE_BACKEND=gcs,STORAGE_BUCKET=$BUCKET"
+
 if [ -n "$HOST" ]; then
   echo "▸ Deploying with passkey auth bound to: https://$HOST"
-  ENV="DATA_BACKEND=mongo,AUTH_REQUIRED=true,RP_NAME=MyeloTrack"
+  ENV="DATA_BACKEND=mongo,$STORAGE,AUTH_REQUIRED=true,RP_NAME=MyeloTrack"
   ENV="$ENV,RP_ID=$HOST,RP_ORIGIN=https://$HOST,APP_URL=https://$HOST,CORS_ORIGINS=https://$HOST"
 else
   echo "▸ First deploy — no public host yet. Bootstrapping WITHOUT auth."
   echo "  Re-run this script after it prints the URL to enable passkeys."
-  ENV="DATA_BACKEND=mongo,AUTH_REQUIRED=false,RP_NAME=MyeloTrack"
+  ENV="DATA_BACKEND=mongo,$STORAGE,AUTH_REQUIRED=false,RP_NAME=MyeloTrack"
 fi
 
 gcloud run deploy "$SERVICE" \

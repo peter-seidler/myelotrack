@@ -38,6 +38,14 @@ else
   echo "  created (Google-managed encryption; upgrade to CMEK/KMS if policy requires)"
 fi
 
+echo "▸ Granting the Cloud Run runtime service account access to the bucket…"
+PROJECT_NUMBER="$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')"
+RUNTIME_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+gcloud storage buckets add-iam-policy-binding "gs://$BUCKET" \
+  --member="serviceAccount:${RUNTIME_SA}" \
+  --role="roles/storage.objectAdmin" >/dev/null
+echo "  ${RUNTIME_SA} → objectAdmin on gs://$BUCKET"
+
 echo "▸ Secrets…"
 for S in MONGODB_URI FIELD_ENCRYPTION_KEY SESSION_SECRET; do
   if gcloud secrets describe "$S" >/dev/null 2>&1; then

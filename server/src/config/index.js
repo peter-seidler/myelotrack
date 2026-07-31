@@ -43,8 +43,8 @@ export const config = {
   // default seeded/dev setup.
   fieldEncryptionKey: process.env.FIELD_ENCRYPTION_KEY || '',
   // Object storage for pallor images. "local" writes encrypted blobs under
-  // storageDir; "memory" keeps them in-process (tests). An "s3" backend (SSE-KMS)
-  // is the production target — see docs/architecture.md.
+  // storageDir; "memory" keeps them in-process (tests); "gcs" is the production
+  // target (Google Cloud Storage bucket). All backends encrypt bytes at rest.
   storageBackend: process.env.STORAGE_BACKEND || 'local',
   storageDir: process.env.STORAGE_DIR || './.data/pallor',
   storageBucket: process.env.STORAGE_BUCKET || 'myelotrack-pallor',
