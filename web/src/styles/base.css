@@ -53,7 +53,8 @@ textarea {
   display: flex;
   flex-direction: column;
 }
-@media (min-width: 520px) {
+/* Small windows / phones-on-desktop: float the app as a phone mockup. */
+@media (min-width: 520px) and (max-width: 767.98px) {
   body {
     background: var(--page-bg);
   }
@@ -181,4 +182,93 @@ textarea {
 .tabbar button svg {
   width: 26px;
   height: 26px;
+}
+
+/* Tablet + desktop: a real two-pane app — left nav rail, centered content.
+   Placed last so these rules win over the phone chrome above. */
+@media (min-width: 768px) {
+  body {
+    background: var(--page-bg);
+  }
+  .device {
+    max-width: 1040px;
+    height: 100dvh;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 236px minmax(0, 1fr);
+    grid-template-areas:
+      'rail header'
+      'rail main';
+    background: var(--bg);
+    box-shadow: 0 0 0 1px var(--hairline);
+  }
+  .navbar {
+    grid-area: header;
+  }
+  /* The rail carries the brand now — drop the small mark in the header. */
+  .navbar .eyebrow .brand-logo {
+    display: none;
+  }
+  .scroll {
+    grid-area: main;
+    min-height: 0; /* let the grid row bound the scroll area */
+    padding: 4px 32px 48px;
+  }
+  /* Content sits in a comfortable, readable column inside the wide pane. */
+  .tab-view.active {
+    max-width: 660px;
+    margin-inline: auto;
+  }
+
+  /* Bottom tab bar → left navigation rail. */
+  .tabbar {
+    grid-area: rail;
+    position: sticky;
+    top: 0;
+    bottom: auto;
+    align-self: start;
+    height: 100dvh;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 2px;
+    padding: 22px 14px;
+    background: var(--bg-elev);
+    box-shadow: inset -0.5px 0 0 var(--separator);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .tabbar::before {
+    content: 'MyeloTrack';
+    font-family: 'Inter Tight', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: -0.02em;
+    color: var(--msk-blue);
+    padding: 4px 12px 20px;
+  }
+  .tabbar button {
+    flex: none;
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 13px;
+    padding: 11px 13px;
+    border-radius: 11px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .tabbar button:hover {
+    background: var(--bg-elev-2);
+    color: var(--label);
+  }
+  .tabbar button.active {
+    background: rgba(0, 122, 255, 0.12);
+    color: var(--blue);
+  }
+  .tabbar button svg {
+    width: 22px;
+    height: 22px;
+  }
 }
